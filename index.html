@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Skicák v8</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+  <div class="book-viewport">
+    <div id="book" class="book">
+      <button id="prev-btn" class="nav-btn prev" aria-label="Předchozí"></button>
+      <button id="next-btn" class="nav-btn next" aria-label="Další"></button>
+
+      <!-- 11 listů p0–p10 (22 stran page-0 až page-21) -->
+      <div id="p0" class="paper">
+        <div class="front"><img src="assets/page-0.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-1.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p1" class="paper">
+        <div class="front"><img src="assets/page-2.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-3.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p2" class="paper">
+        <div class="front"><img src="assets/page-4.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-5.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p3" class="paper">
+        <div class="front"><img src="assets/page-6.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-7.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p4" class="paper">
+        <div class="front"><img src="assets/page-8.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-9.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p5" class="paper">
+        <div class="front"><img src="assets/page-10.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-11.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p6" class="paper">
+        <div class="front"><img src="assets/page-12.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-13.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p7" class="paper">
+        <div class="front"><img src="assets/page-14.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-15.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p8" class="paper">
+        <div class="front"><img src="assets/page-16.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-17.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p9" class="paper">
+        <div class="front"><img src="assets/page-18.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-19.jpg" class="page-image" alt=""></div>
+      </div>
+      <div id="p10" class="paper">
+        <div class="front"><img src="assets/page-20.jpg" class="page-image" alt=""></div>
+        <div class="back"><img src="assets/page-21.jpg" class="page-image" alt=""></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll slider -->
+  <div class="slider-wrap">
+    <input type="range" id="pageSlider" min="0" max="11" step="0.001" value="0">
+  </div>
+
+  <script src="script.js?v=10"></script>
+</body>
+</html>

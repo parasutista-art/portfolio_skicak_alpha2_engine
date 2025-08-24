@@ -1,0 +1,129 @@
+:root{
+  --page-ratio: 2480 / 3508;
+  --spread-ratio: calc(2 * var(--page-ratio));
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#000;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100svh;
+  flex-direction:column;
+  user-select:none;
+}
+
+.book-viewport{
+  width: calc(min(90vw, 90vh * var(--spread-ratio)));
+  height: calc(min(90vh, 90vw / var(--spread-ratio)));
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.book{
+  position:relative;
+  width:100%;
+  height:100%;
+  transform-style:preserve-3d;
+  perspective:2000px;
+  transform:translateX(0);
+}
+
+.paper{
+  position:absolute;
+  width:50%;
+  height:100%;
+  top:0;
+  left:50%;
+  transform-style:preserve-3d;
+  transform-origin:left center;
+}
+#p0{z-index:50;} /* obálka nahoře při startu */
+
+.paper .front,
+.paper .back{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  background:#000;
+}
+.paper .front{ z-index:1 }
+.paper .back{ transform:rotateY(180deg) }
+
+.page-image{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.nav-btn{
+  position:absolute;
+  top:0; width:15%; height:100%;
+  z-index:1000;
+  background:transparent;
+  border:none; cursor:pointer;
+}
+.nav-btn.prev{ left:0 }
+.nav-btn.next{ right:0 }
+.nav-btn.disabled{ display:none }
+
+.slider-wrap{
+  width:80%;
+  margin-top:20px;
+}
+
+/* custom slider – jednotný track */
+#pageSlider{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:18px;
+  background:transparent;
+  cursor:pointer;
+}
+#pageSlider:focus{ outline:none }
+
+#pageSlider::-webkit-slider-runnable-track{
+  height:4px;
+  background:#444;
+  border-radius:2px;
+}
+#pageSlider::-moz-range-track{
+  height:4px;
+  background:#444;
+  border-radius:2px;
+}
+#pageSlider::-ms-track{
+  height:4px;
+  background:transparent;
+  border-color:transparent;
+  color:transparent;
+}
+#pageSlider::-ms-fill-lower{ background:#444 }
+#pageSlider::-ms-fill-upper{ background:#444 }
+
+#pageSlider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:16px; height:16px;
+  border-radius:50%;
+  background:#eee;
+  border:none;
+  margin-top:-6px;
+  box-shadow:0 0 0 2px #0003;
+}
+#pageSlider::-moz-range-thumb,
+#pageSlider::-ms-thumb{
+  width:16px; height:16px;
+  border-radius:50%;
+  background:#eee;
+  border:none;
+  box-shadow:0 0 0 2px #0003;
+}
+#pageSlider::-moz-range-progress{ background:#444; height:4px }
