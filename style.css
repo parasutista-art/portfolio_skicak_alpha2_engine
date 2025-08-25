@@ -127,3 +127,22 @@ body{
   box-shadow:0 0 0 2px #0003;
 }
 #pageSlider::-moz-range-progress{ background:#444; height:4px }
+
+/* === alpha2.9: slider above pages === */
+.slider-wrap, 
+#pageSlider {
+  position: relative;
+  z-index: 5000; /* keep slider on top of flipping pages */
+}
+
+
+/* alpha2.13a cover overlays */
+#cover-left-overlay, #cover-right-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 2000; /* above pages but below UI buttons */
+}
+#cover-left-overlay { left: 0; }
+#cover-right-overlay { right: 0; }
