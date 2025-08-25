@@ -224,14 +224,18 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 
-// === alpha3.1: touch swipe support (non-intrusive) ===
+
+
+
+
+// === alpha3.2: improved mobile swipe support ===
 (function(){
   function ready(fn){
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
     else fn();
   }
   ready(()=>{
-    const container = document.getElementById('book') || document.querySelector('.book') || document.body;
+    const container = document.getElementById('book') || document.querySelector('.book');
     if(!container) return;
     let startX=0, startY=0, startT=0, isMoving=false;
 
@@ -249,8 +253,9 @@ window.addEventListener("DOMContentLoaded", () => {
       if(!isMoving) return;
       const t=getTouch(e); if(!t) return;
       const dx=t.clientX-startX, dy=t.clientY-startY;
-      if(Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)*1.2){
-        try{e.preventDefault();}catch{}
+      if(Math.abs(dx)>Math.abs(dy)*1.2){
+        // swipe intent: disable vertical page scroll
+        e.preventDefault();
       }
     }, {passive:false});
 
@@ -259,14 +264,73 @@ window.addEventListener("DOMContentLoaded", () => {
       const t=getTouch(e); if(!t) return;
       const dx=t.clientX-startX, dy=t.clientY-startY, dt=Date.now()-startT;
       const horiz=Math.abs(dx)>Math.abs(dy)*1.2;
-      if(horiz && Math.abs(dx)>=50){
+      const SWIPE_DIST = 30; // lowered threshold
+      const TAP_DIST = 10;
+      const TAP_TIME = 300;
+
+      if(horiz && Math.abs(dx)>=SWIPE_DIST){
         const dir=dx<0?'next':'prev';
         const btn=document.getElementById(dir==='next'?'next-btn':'prev-btn');
         if(btn) btn.click();
+      } else if(Math.abs(dx)<=TAP_DIST && Math.abs(dy)<=TAP_DIST && dt<=TAP_TIME){
+        // let native click pass (tap)
       }
-      // small tap passes through
     }, {passive:true});
 
     container.addEventListener('touchcancel', ()=>{isMoving=false;}, {passive:true});
+  });
+})();
+
+
+
+// === alpha3.3: restrict overlay click to covers only ===
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+  ready(()=>{
+    const left = document.getElementById('cover-left-overlay');
+    const right = document.getElementById('cover-right-overlay');
+    if(left){
+      left.addEventListener('click', ()=>{
+        const prevBtn = document.getElementById('prev-btn');
+        // only if we're on first page (left cover visible)
+        if(document.body.classList.contains('at-beginning') && prevBtn){ prevBtn.click(); }
+      });
+    }
+    if(right){
+      right.addEventListener('click', ()=>{
+        const nextBtn = document.getElementById('next-btn');
+        // only if we're on last page (right cover visible)
+        if(document.body.classList.contains('at-end') && nextBtn){ nextBtn.click(); }
+      });
+    }
+  });
+})();
+
+
+
+// === alpha3.4: cover overlays only on first/last page ===
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+  ready(()=>{
+    const left = document.querySelector('.cover-overlay.left');
+    const right = document.querySelector('.cover-overlay.right');
+    if(left){
+      left.addEventListener('click', ()=>{
+        const prevBtn = document.getElementById('prev-btn');
+        if(prevBtn) prevBtn.click();
+      });
+    }
+    if(right){
+      right.addEventListener('click', ()=>{
+        const nextBtn = document.getElementById('next-btn');
+        if(nextBtn) nextBtn.click();
+      });
+    }
   });
 })();
