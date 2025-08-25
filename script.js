@@ -174,3 +174,99 @@ window.addEventListener('wheel',(e)=>{
 },{passive:false});
 
 slider.value=0; updateBook(0);
+
+
+
+
+
+// === alpha2.13: cover click fix ===
+window.addEventListener("DOMContentLoaded", () => {
+  const first = document.querySelector(".paper:first-child");
+  const last  = document.querySelector(".paper:last-child");
+  if(first){
+    first.addEventListener("click", e => {
+      if(e.target.closest(".prev-btn,.next-btn")) return;
+      if(typeof nextPage === "function") nextPage();
+    });
+  }
+  if(last){
+    last.addEventListener("click", e => {
+      if(e.target.closest(".prev-btn,.next-btn")) return;
+      if(typeof prevPage === "function") prevPage();
+    });
+  }
+});
+
+
+// === alpha2.13a: cover overlay click ===
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+  ready(()=>{
+    const left = document.getElementById('cover-left-overlay');
+    const right = document.getElementById('cover-right-overlay');
+    if(left){
+      left.addEventListener('click', ()=>{
+        const prevBtn = document.getElementById('prev-btn');
+        if(prevBtn) prevBtn.click();
+      });
+    }
+    if(right){
+      right.addEventListener('click', ()=>{
+        const nextBtn = document.getElementById('next-btn');
+        if(nextBtn) nextBtn.click();
+      });
+    }
+  });
+})();
+
+
+
+// === alpha3.1: touch swipe support (non-intrusive) ===
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+  ready(()=>{
+    const container = document.getElementById('book') || document.querySelector('.book') || document.body;
+    if(!container) return;
+    let startX=0, startY=0, startT=0, isMoving=false;
+
+    function getTouch(e){
+      return e.touches && e.touches[0] ? e.touches[0] : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : null);
+    }
+
+    container.addEventListener('touchstart', e=>{
+      const t=getTouch(e); if(!t) return;
+      if (e.target.closest('#pageSlider,#prev-btn,#next-btn')) return;
+      startX=t.clientX; startY=t.clientY; startT=Date.now(); isMoving=true;
+    }, {passive:true});
+
+    container.addEventListener('touchmove', e=>{
+      if(!isMoving) return;
+      const t=getTouch(e); if(!t) return;
+      const dx=t.clientX-startX, dy=t.clientY-startY;
+      if(Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)*1.2){
+        try{e.preventDefault();}catch{}
+      }
+    }, {passive:false});
+
+    container.addEventListener('touchend', e=>{
+      if(!isMoving) return; isMoving=false;
+      const t=getTouch(e); if(!t) return;
+      const dx=t.clientX-startX, dy=t.clientY-startY, dt=Date.now()-startT;
+      const horiz=Math.abs(dx)>Math.abs(dy)*1.2;
+      if(horiz && Math.abs(dx)>=50){
+        const dir=dx<0?'next':'prev';
+        const btn=document.getElementById(dir==='next'?'next-btn':'prev-btn');
+        if(btn) btn.click();
+      }
+      // small tap passes through
+    }, {passive:true});
+
+    container.addEventListener('touchcancel', ()=>{isMoving=false;}, {passive:true});
+  });
+})();
