@@ -334,3 +334,82 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 })();
+
+
+
+// === alpha3.5: fixes (swipe sensitivity, loading screen, slider touch) ===
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+  ready(()=>{
+    // Hide loading when first images loaded
+    const loading = document.getElementById('loading-screen');
+    if(loading){
+      let imgs = Array.from(document.querySelectorAll('img'));
+      let loadedCount = 0;
+      function checkLoaded(){
+        loadedCount++;
+        if(loadedCount >= Math.min(imgs.length, 2)){ // at least first two images
+          loading.style.display = 'none';
+        }
+      }
+      if(imgs.length === 0){ loading.style.display='none'; }
+      imgs.forEach(img=>{
+        if(img.complete) checkLoaded();
+        else img.addEventListener('load', checkLoaded);
+      });
+    }
+
+    // Improved swipe
+    const container = document.getElementById('book') || document.querySelector('.book');
+    if(container){
+      let startX=0, startY=0, startT=0, isMoving=false;
+      function getTouch(e){ return e.touches && e.touches[0] ? e.touches[0] : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : null); }
+      container.addEventListener('touchstart', e=>{
+        const t=getTouch(e); if(!t) return;
+        if (e.target.closest('#pageSlider,#prev-btn,#next-btn')) return;
+        startX=t.clientX; startY=t.clientY; startT=Date.now(); isMoving=true;
+      }, {passive:true});
+      container.addEventListener('touchmove', e=>{
+        if(!isMoving) return;
+        const t=getTouch(e); if(!t) return;
+        const dx=t.clientX-startX, dy=t.clientY-startY;
+        if(Math.abs(dx)>Math.abs(dy)*1.05){ e.preventDefault(); }
+      }, {passive:false});
+      container.addEventListener('touchend', e=>{
+        if(!isMoving) return; isMoving=false;
+        const t=getTouch(e); if(!t) return;
+        const dx=t.clientX-startX, dy=t.clientY-startY, dt=Date.now()-startT;
+        const horiz=Math.abs(dx)>Math.abs(dy)*1.05;
+        const SWIPE_DIST = 20;
+        const SWIPE_SPEED = 0.3; // px/ms
+        const speed = Math.abs(dx)/dt;
+        if(horiz && (Math.abs(dx)>=SWIPE_DIST || speed>SWIPE_SPEED)){
+          const dir=dx<0?'next':'prev';
+          const btn=document.getElementById(dir==='next'?'next-btn':'prev-btn');
+          if(btn) btn.click();
+        }
+      }, {passive:true});
+      container.addEventListener('touchcancel', ()=>{isMoving=false;}, {passive:true});
+    }
+
+    // Slider touch support
+    const slider = document.getElementById('pageSlider');
+    if(slider){
+      let dragging=false;
+      slider.addEventListener('touchstart', e=>{ dragging=true; }, {passive:true});
+      slider.addEventListener('touchend', e=>{ dragging=false; }, {passive:true});
+      slider.addEventListener('touchmove', e=>{
+        if(!dragging) return;
+        const t=e.touches[0]; if(!t) return;
+        const rect=slider.getBoundingClientRect();
+        const x = (t.clientX-rect.left)/rect.width;
+        const val = Math.min(Math.max(0,x),1)*(slider.max-slider.min)+Number(slider.min);
+        slider.value = val;
+        slider.dispatchEvent(new Event('input',{bubbles:true}));
+      }, {passive:true});
+    }
+  });
+})();
