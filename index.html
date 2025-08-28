@@ -2,25 +2,14 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Skicák v8</title>
+  <title>Flipbook Lite v6 (minimal)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="loading-screen">
-  <div class="spinner"></div>
-  <p>Načítám...</p>
-</div>
-
-
-
-
   <div class="book-viewport">
     <div id="book" class="book">
-      <button id="prev-btn" class="nav-btn prev" aria-label="Předchozí"></button>
-      <button id="next-btn" class="nav-btn next" aria-label="Další"></button>
-
       <!-- 11 listů p0–p10 (22 stran page-0 až page-21) -->
       <div id="p0" class="paper">
         <div class="front"><img src="assets/page-0.jpg" class="page-image" alt=""></div>
@@ -69,11 +58,12 @@
     </div>
   </div>
 
-  <!-- Scroll slider -->
-  <div class="slider-wrap">
-    <input type="range" id="pageSlider" min="0" max="11" step="0.001" value="0">
+  <!-- Vlastní minimal slider -->
+  <div id="slider" class="slider">
+    <div class="track"></div>
+    <div class="thumb" id="thumb" role="button" aria-label="posuvník"></div>
   </div>
 
-  <script src="script.js?v=19"></script>
+  <script src="script.js"></script>
 </body>
 </html>
