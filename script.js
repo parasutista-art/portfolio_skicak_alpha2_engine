@@ -1,34 +1,21 @@
-// Flipbook Lite v6 - minimal, bez <input type="range">
+const viewport = document.getElementById("viewport");
 const book = document.getElementById("book");
-const slider = document.getElementById("slider");
-const track = slider.querySelector(".track");
-const thumb = document.getElementById("thumb");
-
-const MAX_SPREAD = 11; // 11 listů (0..11)
+const slider = document.getElementById("pageSlider");
 const papers = [];
 for (let i = 0; i <= 10; i++) {
   const paper = document.getElementById(`p${i}`);
   if (paper) papers.push(paper);
 }
 
-let value = 0;    // aktuální pozice (0..11)
-let animFrame = null;
+const MAX_SPREAD = parseFloat(slider.max);
+let currentSpread = 0;
 
 // easing
-const easeOutCubic = x => 1 - Math.pow(1-x,3);
+function easeOutCubic(x){ return 1 - Math.pow(1-x,3); }
 
-function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-
-function setThumbByValue(v){
-  const rect = slider.getBoundingClientRect();
-  const ratio = v / MAX_SPREAD;
-  const x = ratio * rect.width;
-  thumb.style.left = (x - thumb.offsetWidth/2) + "px";
-}
-
-function updateBook(v){
+function updateBook(value){
   papers.forEach((paper,i)=>{
-    let progress=v-i;
+    let progress=value-i;
     if(progress<=0){
       paper.style.transform='rotateY(0deg)';
       paper.style.zIndex=100+(papers.length-i);
@@ -37,83 +24,161 @@ function updateBook(v){
       paper.style.zIndex=100+i;
     } else {
       paper.style.transform=`rotateY(${-180*progress}deg)`;
-      paper.style.zIndex=2000; // animovaná strana navrchu
+      paper.style.zIndex=2000;
     }
   });
-  setThumbByValue(v);
 }
 
-function stopAnimation(){ if(animFrame){ cancelAnimationFrame(animFrame); animFrame=null; } }
+let animFrame=null;
+let isAnimating=false;
+function stopAnimation(){ if(animFrame){ cancelAnimationFrame(animFrame); animFrame=null; }}
 
-function animateTo(from, to, duration=800){
+function animateTo(valueFrom,valueTo,duration=800){
+  if(isAnimating) return;
+  isAnimating=true;
   stopAnimation();
-  const start = performance.now();
-  const target = clamp(to, 0, MAX_SPREAD);
-  const diff = target - from;
+  const target = Math.max(0,Math.min(MAX_SPREAD,valueTo));
+  const diff = target - valueFrom;
+  const startTime=performance.now();
+
   function tick(t){
-    let u = (t - start) / duration; if(u>1) u=1;
-    const val = from + diff * easeOutCubic(u);
-    value = val; updateBook(value);
-    if(u<1) animFrame=requestAnimationFrame(tick); else animFrame=null;
+    let u=(t-startTime)/duration; if(u>1)u=1;
+    let eased=easeOutCubic(u);
+    const val=valueFrom+diff*eased;
+    slider.value=val; updateBook(val);
+    if(u<1){ animFrame=requestAnimationFrame(tick);} else {
+      currentSpread=target; slider.value=currentSpread; updateBook(currentSpread); animFrame=null; isAnimating=false;
+    }
   }
-  animFrame = requestAnimationFrame(tick);
+  animFrame=requestAnimationFrame(tick);
 }
 
-// --- Interakce ---
+// API
+function goTo(spread){ animateTo(currentSpread, spread, 800); }
+function next(){ goTo(currentSpread+1); }
+function prev(){ goTo(currentSpread-1); }
 
-// Klik na track -> animace
-track.addEventListener("mousedown", (e)=>{
-  const rect = track.getBoundingClientRect();
-  const ratio = (e.clientX - rect.left) / rect.width;
-  const target = Math.round(ratio * MAX_SPREAD);
-  animateTo(value, target, 800);
+// Expose for sidebar buttons
+window.goTo = goTo;
+window.next = next;
+window.prev = prev;
+
+// slider drag
+slider.addEventListener("input", e=>{
+  if(!isAnimating){ updateBook(parseFloat(slider.value)); }
+});
+slider.addEventListener("change", e=>{
+  if(!isAnimating){ 
+    const target=Math.round(parseFloat(slider.value));
+    animateTo(parseFloat(slider.value), target, 500);
+  }
 });
 
-// Drag thumb (globální, pouze vodorovně)
-let dragging=false, dragOffsetX=0;
-thumb.addEventListener("mousedown", (e)=>{
-  dragging = true;
-  const rect = thumb.getBoundingClientRect();
-  dragOffsetX = e.clientX - (rect.left + rect.width/2);
-  e.preventDefault();
+// Tap na slider track -> animovaný skok (desktop + touch)
+function handleSliderTapX(clientX){
+  const rect = slider.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const percent = Math.max(0, Math.min(1, x/rect.width));
+  const target = Math.round(percent * MAX_SPREAD);
+  // reset vizuální pozici slideru zpět na current, ať je vidět animace
+  slider.value = currentSpread;
+  goTo(target);
+}
+
+// Desktop
+slider.addEventListener("mousedown", e => {
+  // pokud klik pouze na track (ne drag), vyřešíme v mouseup s tolerancí
+  const startX = e.clientX;
+  const startTime = performance.now();
+  function onUp(ev){
+    document.removeEventListener('mouseup', onUp);
+    const moved = Math.abs(ev.clientX - startX);
+    const dt = performance.now() - startTime;
+    if (moved < 5 && dt < 300) {
+      handleSliderTapX(ev.clientX);
+    }
+  }
+  document.addEventListener('mouseup', onUp);
 });
 
-document.addEventListener("mousemove", (e)=>{
-  if(!dragging) return;
-  const rect = track.getBoundingClientRect();
-  const pos = clamp(e.clientX - dragOffsetX, rect.left, rect.right);
-  const ratio = (pos - rect.left) / rect.width;
-  value = ratio * MAX_SPREAD;
-  updateBook(value);
-});
+// Touch (tap na track s tolerancí, bez blokace nativního dragu)
+slider.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) return;
+  const t0 = e.touches[0];
+  const startX = t0.clientX;
+  const startY = t0.clientY;
+  const startTime = performance.now();
+  let movedFar = false;
+  function onMove(ev){
+    const t = ev.touches[0];
+    if (Math.hypot(t.clientX-startX, t.clientY-startY) > 10) movedFar = True;
+  }
+  function onEnd(ev){
+    slider.removeEventListener('touchmove', onMove);
+    slider.removeEventListener('touchend', onEnd);
+    slider.removeEventListener('touchcancel', onEnd);
+    const dt = performance.now() - startTime;
+    if (!movedFar && dt < 300) {
+      const touch = (ev.changedTouches && ev.changedTouches[0]) ? ev.changedTouches[0] : t0;
+      handleSliderTapX(touch.clientX);
+    }
+  }
+  slider.addEventListener('touchmove', onMove, {passive:true});
+  slider.addEventListener('touchend', onEnd);
+  slider.addEventListener('touchcancel', onEnd);
+}, {passive:true});
 
-document.addEventListener("mouseup", ()=>{
-  if(!dragging) return;
-  dragging=false;
-  const target = Math.round(value);
-  animateTo(value, target, 500);
-});
-
-// Kolečko myši -> plynulý posun + dorovnání
+// kolečko myši -> listování (desktop)
 let wheelAccum=0, wheelAnimating=false;
 function animateWheel(){
-  if(Math.abs(wheelAccum) < 0.001){
+  if(Math.abs(wheelAccum)<0.001){
     wheelAnimating=false;
-    const target=Math.round(value);
-    animateTo(value,target,500);
+    const target=Math.round(parseFloat(slider.value));
+    animateTo(parseFloat(slider.value),target,500);
     return;
   }
-  const step = wheelAccum*0.15;
-  wheelAccum -= step;
-  value = clamp(value + step, 0, MAX_SPREAD);
-  updateBook(value);
+  const current=parseFloat(slider.value);
+  const step=wheelAccum*0.15;
+  wheelAccum-=step;
+  const nextVal=Math.max(0,Math.min(MAX_SPREAD,current+step));
+  slider.value=nextVal; updateBook(nextVal);
   requestAnimationFrame(animateWheel);
 }
-window.addEventListener("wheel", (e)=>{
+window.addEventListener("wheel", e=>{
   e.preventDefault();
-  wheelAccum += e.deltaY * 0.0025;
+  const factor=0.0025;
+  wheelAccum+=e.deltaY*factor;
   if(!wheelAnimating){ wheelAnimating=true; requestAnimationFrame(animateWheel); }
+},{passive:false});
+
+// Swipe po knize (touch)
+let touchStartX=0, touchStartY=0, touchActive=false, swipeFired=false;
+viewport.addEventListener('touchstart', (e)=>{
+  if (e.touches.length !== 1) return;
+  const t = e.touches[0];
+  touchStartX = t.clientX;
+  touchStartY = t.clientY;
+  touchActive = true;
+  swipeFired = false;
+}, {passive:true});
+
+viewport.addEventListener('touchmove', (e)=>{
+  if(!touchActive || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  const dx = t.clientX - touchStartX;
+  const dy = t.clientY - touchStartY;
+  // horizontální převaha a slušný práh
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)*1.5 && !swipeFired && !isAnimating){
+    e.preventDefault(); // zabraň svislému posunu během swipu
+    swipeFired = true;
+    if (dx < 0) next(); else prev();
+  }
 }, {passive:false});
 
-// Init
-updateBook(0);
+viewport.addEventListener('touchend', ()=>{
+  touchActive = false;
+  swipeFired = false;
+}, {passive:true});
+
+// init
+slider.value=0; updateBook(0);
