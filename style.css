@@ -12,7 +12,7 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100svh;
+  height:100vh;
   flex-direction:column;
   user-select:none;
 }
@@ -31,7 +31,6 @@ body{
   height:100%;
   transform-style:preserve-3d;
   perspective:2000px;
-  transform:translateX(0);
 }
 
 .paper{
@@ -43,17 +42,17 @@ body{
   transform-style:preserve-3d;
   transform-origin:left center;
 }
-#p0{z-index:50;} /* obálka nahoře při startu */
 
 .paper .front,
 .paper .back{
   position:absolute;
   inset:0;
   backface-visibility:hidden;
+  transform-style:preserve-3d;
   background:#000;
 }
 .paper .front{ z-index:1 }
-.paper .back{ transform:rotateY(180deg) }
+.paper .back{ transform:rotateY(180deg) translateZ(0.1px); }
 
 .page-image{
   width:100%;
@@ -62,136 +61,22 @@ body{
   display:block;
 }
 
-.nav-btn{
-  position:absolute;
-  top:0; width:15%; height:100%;
-  z-index:1000;
-  background:transparent;
-  border:none; cursor:pointer;
-}
-.nav-btn.prev{ left:0 }
-.nav-btn.next{ right:0 }
-.nav-btn.disabled{ display:none }
-
-.slider-wrap{
+/* Minimal slider */
+.slider{
+  position:relative;
   width:80%;
+  height:28px;
   margin-top:20px;
 }
-
-/* custom slider – jednotný track */
-#pageSlider{
-  -webkit-appearance:none;
-  appearance:none;
-  width:100%;
-  height:18px;
-  background:transparent;
+.slider .track{
+  position:absolute; left:0; right:0; top:50%;
+  height:4px; margin-top:-2px;
+  background:#444; border-radius:2px;
+}
+.slider .thumb{
+  position:absolute; top:50%; width:16px; height:16px;
+  margin-top:-8px;
+  border-radius:50%; background:#eee; box-shadow:0 0 0 2px #0003;
   cursor:pointer;
+  touch-action:none;
 }
-#pageSlider:focus{ outline:none }
-
-#pageSlider::-webkit-slider-runnable-track{
-  height:4px;
-  background:#444;
-  border-radius:2px;
-}
-#pageSlider::-moz-range-track{
-  height:4px;
-  background:#444;
-  border-radius:2px;
-}
-#pageSlider::-ms-track{
-  height:4px;
-  background:transparent;
-  border-color:transparent;
-  color:transparent;
-}
-#pageSlider::-ms-fill-lower{ background:#444 }
-#pageSlider::-ms-fill-upper{ background:#444 }
-
-#pageSlider::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  appearance:none;
-  width:16px; height:16px;
-  border-radius:50%;
-  background:#eee;
-  border:none;
-  margin-top:-6px;
-  box-shadow:0 0 0 2px #0003;
-}
-#pageSlider::-moz-range-thumb,
-#pageSlider::-ms-thumb{
-  width:16px; height:16px;
-  border-radius:50%;
-  background:#eee;
-  border:none;
-  box-shadow:0 0 0 2px #0003;
-}
-#pageSlider::-moz-range-progress{ background:#444; height:4px }
-
-/* === alpha2.9: slider above pages === */
-.slider-wrap, 
-#pageSlider {
-  position: relative;
-  z-index: 5000; /* keep slider on top of flipping pages */
-}
-
-
-/* alpha2.13a cover overlays */
-#cover-left-overlay, #cover-right-overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  z-index: 2000; /* above pages but below UI buttons */
-}
-#cover-left-overlay { left: 0; }
-#cover-right-overlay { right: 0; }
-
-
-/* alpha3.3: overlays restricted to covers only */
-#cover-left-overlay, #cover-right-overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  z-index: 2000;
-}
-#cover-left-overlay { left: 0; }
-#cover-right-overlay { right: 0; }
-
-
-/* alpha3.4: overlays only on covers */
-.cover-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2000;
-}
-.cover-overlay.left { cursor: pointer; }
-.cover-overlay.right { cursor: pointer; }
-
-
-/* alpha3.5: loading screen */
-#loading-screen {
-  position: fixed;
-  top:0; left:0; right:0; bottom:0;
-  background: #000;
-  color:#fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-family: sans-serif;
-  z-index: 10000;
-}
-#loading-screen .spinner {
-  width: 40px; height: 40px;
-  border: 4px solid #444;
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 10px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
