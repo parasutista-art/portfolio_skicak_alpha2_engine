@@ -1,86 +1,104 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <title>Flipbook Lite v10 (touch)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flipbook v15 Fixed (Lightbox + Video)</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- Levé menu s testovacími tlačítky (lze smazat) -->
   <div class="sidebar">
     <h3>Dvojstránky</h3>
     <button onclick="goTo(0)">Spread 0</button>
-    <button onclick="goTo(1)">Spread 1</button>
-    <button onclick="goTo(2)">Spread 2</button>
-    <button onclick="goTo(3)">Spread 3</button>
-    <button onclick="goTo(4)">Spread 4</button>
-    <button onclick="goTo(5)">Spread 5</button>
-    <button onclick="goTo(6)">Spread 6</button>
-    <button onclick="goTo(7)">Spread 7</button>
-    <button onclick="goTo(8)">Spread 8</button>
-    <button onclick="goTo(9)">Spread 9</button>
-    <button onclick="goTo(10)">Spread 10</button>
-    <button onclick="goTo(11)">Spread 11</button>
+<button onclick="goTo(1)">Spread 1</button>
+<button onclick="goTo(2)">Spread 2</button>
+<button onclick="goTo(3)">Spread 3</button>
+<button onclick="goTo(4)">Spread 4</button>
+<button onclick="goTo(5)">Spread 5</button>
+<button onclick="goTo(6)">Spread 6</button>
+<button onclick="goTo(7)">Spread 7</button>
+<button onclick="goTo(8)">Spread 8</button>
+<button onclick="goTo(9)">Spread 9</button>
+<button onclick="goTo(10)">Spread 10</button>
+<button onclick="goTo(11)">Spread 11</button>
   </div>
 
-  <div class="book-viewport" id="viewport">
+  <div class="rightbar">
+    <h3>Media</h3>
+    <button onclick="openLightbox('media/medium1_spread3.jpg')">Open medium1</button>
+    <button onclick="openLightbox('media/medium2_spread3.gif')">Open medium2 (GIF)</button>
+    <button onclick="openLightbox('media/medium3_spread4.gif')">Open medium3 (GIF)</button>
+    <button onclick="openLightbox('media/medium4_spread5.youtube')">Open medium4 (YouTube)</button>
+  </div>
+
+  <div class="book-viewport">
     <div id="book" class="book">
       <div id="p0" class="paper">
-        <div class="front"><img src="assets/page-0.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-1.jpg" class="page-image"></div>
-      </div>
-      <div id="p1" class="paper">
-        <div class="front"><img src="assets/page-2.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-3.jpg" class="page-image"></div>
-      </div>
-      <div id="p2" class="paper">
-        <div class="front"><img src="assets/page-4.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-5.jpg" class="page-image"></div>
-      </div>
-      <div id="p3" class="paper">
-        <div class="front"><img src="assets/page-6.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-7.jpg" class="page-image"></div>
-      </div>
-      <div id="p4" class="paper">
-        <div class="front"><img src="assets/page-8.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-9.jpg" class="page-image"></div>
-      </div>
-      <div id="p5" class="paper">
-        <div class="front"><img src="assets/page-10.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-11.jpg" class="page-image"></div>
-      </div>
-      <div id="p6" class="paper">
-        <div class="front"><img src="assets/page-12.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-13.jpg" class="page-image"></div>
-      </div>
-      <div id="p7" class="paper">
-        <div class="front"><img src="assets/page-14.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-15.jpg" class="page-image"></div>
-      </div>
-      <div id="p8" class="paper">
-        <div class="front"><img src="assets/page-16.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-17.jpg" class="page-image"></div>
-      </div>
-      <div id="p9" class="paper">
-        <div class="front"><img src="assets/page-18.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-19.jpg" class="page-image"></div>
-      </div>
-      <div id="p10" class="paper">
-        <div class="front"><img src="assets/page-20.jpg" class="page-image"></div>
-        <div class="back"><img src="assets/page-21.jpg" class="page-image"></div>
-      </div>
+      <div class="front"><img class="page-image" src="assets/page-0.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-1.jpg" alt=""></div>
+    </div>
+<div id="p1" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-2.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-3.jpg" alt=""></div>
+    </div>
+<div id="p2" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-4.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-5.jpg" alt=""></div>
+    </div>
+<div id="p3" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-6.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-7.jpg" alt=""></div>
+    </div>
+<div id="p4" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-8.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-9.jpg" alt=""></div>
+    </div>
+<div id="p5" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-10.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-11.jpg" alt=""></div>
+    </div>
+<div id="p6" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-12.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-13.jpg" alt=""></div>
+    </div>
+<div id="p7" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-14.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-15.jpg" alt=""></div>
+    </div>
+<div id="p8" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-16.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-17.jpg" alt=""></div>
+    </div>
+<div id="p9" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-18.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-19.jpg" alt=""></div>
+    </div>
+<div id="p10" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-20.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-21.jpg" alt=""></div>
+    </div>
+<div id="p11" class="paper">
+      <div class="front"><img class="page-image" src="assets/page-22.jpg" alt=""></div>
+      <div class="back"><img class="page-image" src="assets/page-23.jpg" alt=""></div>
+    </div>
     </div>
 
-    <!-- Ovládací šipky -->
-    <div class="arrow left" onclick="prev()">&#10094;</div>
-    <div class="arrow right" onclick="next()">&#10095;</div>
+    <div id="arrowLeft" class="arrow left" onclick="prev()">&#10094;</div>
+    <div id="arrowRight" class="arrow right" onclick="next()">&#10095;</div>
 
-    <!-- Slider -->
     <div class="slider-wrap">
-      <input type="range" id="pageSlider" min="0" max="11" step="0.001" value="0">
+      <input type="range" id="pageSlider" min="0" max="11" step="0.001" value="0" />
     </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="lightbox-arrow left" onclick="lightboxPrev()">&#10094;</div>
+    <div id="lightbox-stage" class="lightbox-stage">
+      <!-- dynamic media goes here -->
+      <button id="lb-play" class="lb-play" aria-label="Play video">▶</button>
+    </div>
+    <div class="lightbox-arrow right" onclick="lightboxNext()">&#10095;</div>
   </div>
 
   <script src="script.js"></script>
